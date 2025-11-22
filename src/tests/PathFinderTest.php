@@ -3,6 +3,7 @@
 namespace Tests;
 
 use PathFinder\GridSearch;
+use PathFinder\GridRules;
 use PathFinder\PathFinder;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\InvalidArgumentException;
@@ -20,7 +21,7 @@ class PathFinderTest extends TestCase
         
         $this->mockGridSearch = $this->createMock(GridSearch::class);
         
-        $this->pathFinder = new PathFinder($this->mockGridSearch);
+        $this->pathFinder = new PathFinder($this->mockGridSearch, new GridRules());
     }
 
     protected function createWalkableGrid(): array

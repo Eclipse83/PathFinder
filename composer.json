@@ -4,7 +4,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\": "src/"
+            "PathFinder\\": "src/"
         }
     },
     "minimum-stability": "stable",

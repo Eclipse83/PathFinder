@@ -3,18 +3,14 @@
 namespace PathFinder;
 
 use SplQueue;
+use PathFinder\GridRules;
 
 class GridSearch
 {
-    public function isInBounds(int $row, int $column, int $rows, int $columns): bool
-    {
-        if($row < 0 || $row >= $rows || $column < 0 || $column >= $columns) {
-        return false;
-        }
-        return true;
-    }
+    public function __construct(private GridRules $gridRules)
+    {}
 
-    public function queue(array $grid, int $startRow, int $startColumn, int $goalRow, int $goalColumn, int $rows, int $columns): int|string
+    public function queue(array $grid, int $startRow, int $startColumn, int $goalRow, int $goalColumn, int $rows, int $columns): int
     {
         $queue = new SplQueue();
         
@@ -35,7 +31,7 @@ class GridSearch
                 $neighbourRow = $row + $directionRow;
                 $neighbourColumn = $column + $directionColumn;
 
-                if (!$this->isInBounds($neighbourRow, $neighbourColumn, $rows, $columns)) {
+                if (!$this->gridRules->isInBounds($neighbourRow, $neighbourColumn, $rows, $columns)) {
                     continue;
                 }
 
@@ -48,6 +44,6 @@ class GridSearch
             }
         }
 
-        return 'Goal is unreachable';
+        return -1;
     }
 }

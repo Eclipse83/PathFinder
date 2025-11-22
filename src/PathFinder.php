@@ -3,10 +3,11 @@
 namespace PathFinder;
 
 use PathFinder\GridSearch;
+use PathFinder\GridRules;
 
 class PathFinder
 {
-    public function __construct(private GridSearch $gridSearch)
+    public function __construct(private GridSearch $gridSearch, private GridRules $gridRules)
     {}
 
     public function pathFind(array $grid, array $startPosition, array $goalPosition): int
@@ -35,15 +36,23 @@ class PathFinder
         [$startRow, $startColumn] = $startPosition;
         [$goalRow, $goalColumn] = $goalPosition;
 
-        if(!$this->gridSearch->isInBounds($startRow, $startColumn, $rows, $columns)) {
+        if(!$this->gridRules->isInBounds($startRow, $startColumn, $rows, $columns)) {
             throw new \InvalidArgumentException('Start position is out of bounds.');
         }
 
-        if(!$this->gridSearch->isInBounds($goalRow, $goalColumn, $rows, $columns)) {
+        if(!$this->gridRules->isInBounds($goalRow, $goalColumn, $rows, $columns)) {
             throw new \InvalidArgumentException('Goal position is out of bounds.');
         }
 
-        if($startRow === $goalRow && $startColumn === $goalColumn) {
+        if(!$this->gridRules->isStartDestinationValid($grid[$startRow][$startColumn])) {
+            throw new \InvalidArgumentException('Start position must not be false');
+        }
+
+        if(!$this->gridRules->isGoalDestinationValid($grid[$goalRow][$goalColumn])) {
+            throw new \InvalidArgumentException('Goal position must not be false');
+        }
+
+        if(!$this->gridRules->isStartEndPositionsDifferent($grid[$startRow][$startColumn], $grid[$goalRow][$goalColumn])) {
             throw new \InvalidArgumentException('Start and goal positions must be different.');
         }
 

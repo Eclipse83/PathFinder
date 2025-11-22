@@ -13,7 +13,7 @@ class GridRules
         return true;
     }
 
-    public function isStartDestinationValid(array $startPosition): bool
+    public function isStartDestinationValid(bool $startPosition): bool
     {
         if($startPosition === false) {
         return false;
@@ -22,7 +22,7 @@ class GridRules
         return true;
     }
 
-    public function isGoalDestinationValid(array $goalPosition): bool
+    public function isGoalDestinationValid(bool $goalPosition): bool
     {
         if($goalPosition === false) {
         return false;

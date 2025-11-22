@@ -6,25 +6,22 @@ use PathFinder\GridSearch;
 use PathFinder\GridRules;
 use PathFinder\PathFinder;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\InvalidArgumentException;
 
 class PathFinderTest extends TestCase
 {
-    protected int $rows = 4;
-    protected int $columns = 4;
-    protected GridSearch $mockGridSearch;
-    protected PathFinder $pathFinder;
+    private PathFinder $pathFinder;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
-        $this->mockGridSearch = $this->createMock(GridSearch::class);
-        
-        $this->pathFinder = new PathFinder($this->mockGridSearch, new GridRules());
+
+        $rules = new GridRules();
+        $gridSearch = new GridSearch($rules);
+
+        $this->pathFinder = new PathFinder($gridSearch, $rules);
     }
 
-    protected function createWalkableGrid(): array
+    private function createWalkableGrid(): array
     {
         return [
             [true, true, true, true],
@@ -37,103 +34,92 @@ class PathFinderTest extends TestCase
     public function testShortestPathIsFoundOnOpenGrid(): void
     {
         $grid = $this->createWalkableGrid();
-        
-        $distance = $this->mockGridSearch->queue(
+
+        $distance = $this->pathFinder->pathFind(
             $grid,
-            0, 0,
-            2, 2,
-            $this->rows,
-            $this->columns
+            [0, 0],
+            [2, 2],
         );
 
-        $this->assertEquals(4, $distance);
+        $this->assertSame(4, $distance);
     }
 
     public function testFindsPathAroundObstacle(): void
     {
         $grid = $this->createWalkableGrid();
-        
-        $grid[1][2] = false; 
-        $grid[2][1] = false; 
 
-        $distance = $this->mockGridSearch->queue(
+        $grid[1][2] = false;
+        $grid[2][1] = false;
+
+        $distance = $this->pathFinder->pathFind(
             $grid,
-            0, 0,
-            3, 3,
-            $this->rows,
-            $this->columns
+            [0, 0],
+            [3, 3],
         );
 
-        $this->assertEquals(6, $distance);
+        $this->assertSame(6, $distance);
     }
 
-
-    public function testReturnsIfGoalIsUnreachable(): void
+    public function testReturnsMinusOneIfGoalIsUnreachable(): void
     {
         $grid = $this->createWalkableGrid();
-        
+
         $goalRow = 1;
         $goalColumn = 1;
+
         $grid[0][1] = false;
         $grid[2][1] = false;
         $grid[1][0] = false;
         $grid[1][2] = false;
 
-        $distance = $this->mockGridSearch->queue(
+        $distance = $this->pathFinder->pathFind(
             $grid,
-            0, 0,
-            $goalRow, $goalColumn,
-            $this->rows,
-            $this->columns
+            [0, 0],
+            [$goalRow, $goalColumn],
         );
 
-        $this->assertEquals('Goal is unreachable', $distance);
+        $this->assertSame(-1, $distance);
     }
 
-    public function testReturnsMinusOneIfStartIsOutOfBounds(): void
-    {
-        $grid = $this->createWalkableGrid();
-        
-        $distance = $this->mockGridSearch->queue(
-            $grid,
-            -1, 0,
-            2, 2,
-            $this->rows,
-            $this->columns
-        );
-
-        $this->assertEquals(-1, $distance);
-        
-        $this->assertTrue($grid[0][0]);
-    }
-
-    public function testReturnsIfGoalIsOutOfBounds(): void
-    {
-        $grid = $this->createWalkableGrid();
-        
-        $distance = $this->mockGridSearch->queue(
-            $grid,
-            0, 0,
-            10, 10,
-            $this->rows,
-            $this->columns
-        );
-
-        $this->assertEquals('Goal is unreachable', $distance);
-    }
-    
-    public function testReturnsErrorIfStartEqualsGoal(): void
+    public function testThrowsIfStartIsOutOfBounds(): void
     {
         $grid = $this->createWalkableGrid();
 
-        $this->expectException(InvalidArgumentException::class);
-        
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Start position is out of bounds.');
+
         $this->pathFinder->pathFind(
-            $grid, 
-            [1, 1], 
-            [1, 1]
+            $grid,
+            [-1, 0],
+            [2, 2],
         );
+    }
 
+    public function testThrowsIfGoalIsOutOfBounds(): void
+    {
+        $grid = $this->createWalkableGrid();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Goal position is out of bounds.');
+
+        $this->pathFinder->pathFind(
+            $grid,
+            [0, 0],
+            [10, 10],
+        );
+    }
+
+    public function testThrowsIfStartEqualsGoal(): void
+    {
+        $grid = $this->createWalkableGrid();
+
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Start and goal positions must be different.');
+
+        $this->pathFinder->pathFind(
+            $grid,
+            [1, 1],
+            [1, 1],
+        );
     }
 }

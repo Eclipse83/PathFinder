@@ -52,7 +52,7 @@ class PathFinder
             throw new \InvalidArgumentException('Goal position must not be false');
         }
 
-        if(!$this->gridRules->isStartEndPositionsDifferent($grid[$startRow][$startColumn], $grid[$goalRow][$goalColumn])) {
+        if(!$this->gridRules->isStartEndPositionsDifferent($startPosition, $goalPosition)) {
             throw new \InvalidArgumentException('Start and goal positions must be different.');
         }
 

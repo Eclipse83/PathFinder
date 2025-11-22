@@ -1,7 +1,8 @@
 Small Program to find the shortest distance from point A to point B
 
 Usage:
-  php run.php <grid-json> <start> <end>
+  run composer install
+  run command with valid inputs (SEE BELOW)
 
 Arguments:
   <grid-json>  JSON 2D array of booleans, e.g. [[true,true],[true,false]]
@@ -9,4 +10,5 @@ Arguments:
   <end>        End position as "row,col", e.g. 2,3
 
 Example:
-  php run.php "[[true,true,true],[true,false,true],[true,true,true]]" "0,0" "2,2"
+  MacOS/Linux: php run.php "[[true,true,true],[true,false,true],[true,true,true]]" "0,0" "2,2"
+  Windows: php .\run.php "[[true,true,true],[true,false,true],[true,true,true]]" "0,0" "2,2"
